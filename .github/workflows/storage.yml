@@ -3,9 +3,13 @@ on:
   workflow_dispatch:
   
 env:
+ AZ_RG_NAME: RG3
+ RG_LOCATION: WestEurope
  
  
 permissions:
+ id-token: write
+ contents: read
  
 
 jobs:
@@ -17,19 +21,19 @@ jobs:
       - name: sign in to Azure
         uses: azure/login@v1
         with:
-          client-id: 
-          tenant-id: 
-          subscription-id: 
+          client-id: ${{secrets.AZ_CLIENT_ID}}
+          tenant-id: ${{secrets.AZ_TENANT_ID}}
+          subscription-id: ${{secrets.AZ_SUB_ID}}
 
       - name: deploy RG
         uses: azure/cli@v1
         with:
          inlineScript:
-          az group create --name  --location
+          az group create --name ${{env.AZ_RG_NAME}}  --location ${{RG_LOCATION}}
           
       - name: deploy storage
         uses: azure/arm-deploy@v1
         with:
          deploymentName: ${{github.run_Number}}
-         resourceGroupName: 
-         template: ./sa.bicep
+         resourceGroupName: ${{env.AZ_RG_NAME}}
+         template: ./storage.bicep
